@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Brainrot Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#07040f;--card:#100a22;--card2:#1a1038;--line:#3a2272;--acc:#ff2bd6;--acc2:#00f0ff;--gold:#f8ff3d;--txt:#f1ecff;--mut:#9a8cc7;--grn:#39ff88;--red:#ff3b5c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;color:var(--txt);font-family:Rajdhani,"Segoe UI",system-ui,sans-serif;font-weight:600;font-size:16px;min-height:100vh;padding-bottom:84px;
+background:
+linear-gradient(rgba(0,240,255,.05) 1px,transparent 1px) 0 0/100% 32px,
+linear-gradient(90deg,rgba(255,43,214,.05) 1px,transparent 1px) 0 0/32px 100%,
+radial-gradient(ellipse at 50% -10%,#35106b 0,transparent 55%),
+radial-gradient(ellipse at 100% 100%,#0a2a4a 0,transparent 45%),var(--bg);background-attachment:fixed}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;position:sticky;top:0;background:rgba(7,4,15,.9);backdrop-filter:blur(8px);z-index:5;border-bottom:1px solid var(--acc);box-shadow:0 2px 18px rgba(255,43,214,.45)}
+.logo{font-family:Orbitron,Rajdhani,sans-serif;font-weight:900;font-size:19px;letter-spacing:2px;color:#fff;text-shadow:0 0 6px var(--acc2),0 0 16px var(--acc2),0 0 30px var(--acc);user-select:none}
+.coins{background:#0b0718;border:1px solid var(--gold);color:var(--gold);padding:5px 12px;border-radius:4px;font-weight:700;font-size:18px;text-shadow:0 0 8px var(--gold);box-shadow:0 0 10px rgba(248,255,61,.35),inset 0 0 8px rgba(248,255,61,.15)}
+main{padding:0 14px;max-width:560px;margin:0 auto}
+.tab{display:none}.tab.on{display:block}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(7,4,15,.96);border-top:1px solid var(--acc2);box-shadow:0 -2px 18px rgba(0,240,255,.35);z-index:6}
+nav button{flex:1;background:none;border:0;color:var(--mut);padding:10px 0 14px;font:700 13px Rajdhani,sans-serif;letter-spacing:1px;transition:color .15s}
+nav button span{display:block;font-size:22px;filter:grayscale(1) opacity(.6)}
+nav button.on{color:var(--acc2);text-shadow:0 0 10px var(--acc2);box-shadow:inset 0 3px 0 var(--acc2)}
+nav button.on span{filter:drop-shadow(0 0 6px var(--acc2))}
+h3{margin:16px 0 6px;font-family:Orbitron,Rajdhani,sans-serif;font-size:15px;letter-spacing:2px;color:var(--acc2);text-shadow:0 0 10px rgba(0,240,255,.7)}
+.card{background:linear-gradient(160deg,var(--card),#0b0718);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:6px;padding:12px;margin:10px 0;box-shadow:0 0 14px rgba(255,43,214,.12)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.cc{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:6px;padding:16px 8px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));transition:border-color .15s}
+.cc:active{transform:scale(.97);border-color:var(--acc2)}
+.cc .bar{position:absolute;top:0;left:15%;right:15%;height:3px;border-radius:0 0 3px 3px;box-shadow:0 0 12px currentColor,0 0 4px currentColor}
+.pic{height:96px;width:100%;display:flex;align-items:center;justify-content:center;font-size:48px}
+.pic img{max-width:100%;max-height:96px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(0,240,255,.45))}
+.price{width:92%;background:#07040f;border:1px solid var(--gold);color:var(--gold);font-weight:700;padding:6px;border-radius:4px;text-shadow:0 0 8px rgba(248,255,61,.6)}
+.mut{color:var(--mut);font-size:14px}
+.btn{background:linear-gradient(90deg,var(--acc),#8a2bff);border:0;color:#fff;font:700 16px Rajdhani,sans-serif;letter-spacing:1px;padding:12px 16px;border-radius:4px;width:100%;box-shadow:0 0 16px rgba(255,43,214,.55);text-shadow:0 0 6px rgba(0,0,0,.5);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.btn:active{filter:brightness(1.25)}
+.btn.sm{width:auto;padding:8px 12px;font-size:14px}
+.btn.alt{background:#07040f;border:1px solid var(--acc2);color:var(--acc2);box-shadow:0 0 10px rgba(0,240,255,.35),inset 0 0 8px rgba(0,240,255,.15);clip-path:none}
+.btn.del{background:#07040f;border:1px solid var(--red);color:var(--red);box-shadow:0 0 10px rgba(255,59,92,.35);clip-path:none}
+.row{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.row>.l{display:flex;align-items:center;gap:10px;min-width:0}
+.th{width:48px;height:48px;border-radius:4px;background:#07040f;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.th img{max-width:100%;max-height:100%;object-fit:contain}
+.tag{font-size:11px;padding:2px 6px;border-radius:3px;background:#07040f;border:1px solid var(--line);color:var(--mut);letter-spacing:.5px}
+input,select{width:100%;padding:12px;border-radius:4px;border:1px solid var(--line);background:#07040f;color:#fff;font:600 16px Rajdhani,sans-serif;margin:5px 0}
+input:focus,select:focus{outline:0;border-color:var(--acc2);box-shadow:0 0 10px rgba(0,240,255,.5)}
+input[type=checkbox]{width:auto;margin:0}
+.modal{position:fixed;inset:0;background:rgba(4,2,10,.96);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.box{width:100%;max-width:440px;max-height:92vh;overflow:auto}
+.win{width:100%;max-width:520px;height:116px;overflow:hidden;position:relative;border-radius:6px;border:2px solid var(--acc2);background:#07040f;box-shadow:0 0 22px rgba(0,240,255,.5),inset 0 0 18px rgba(0,240,255,.2)}
+.win:after{content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;background:var(--gold);box-shadow:0 0 12px var(--gold),0 0 24px var(--gold);z-index:2}
+.strip{display:flex;height:100%;transition:transform 4.2s cubic-bezier(.1,.7,.1,1)}
+.it{flex:0 0 90px;display:flex;align-items:center;justify-content:center;font-size:44px;border-right:1px solid var(--line);padding:6px}
+.it img{max-width:100%;max-height:100%;object-fit:contain}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;gap:8px}
+.ch .l{display:flex;align-items:center;gap:8px;min-width:0}
+.ch .th{width:34px;height:34px;font-size:18px}
+.sub{display:flex;gap:6px;overflow:auto;margin:6px 0}
+.sub button{flex:none;background:#07040f;border:1px solid var(--line);color:var(--mut);padding:8px 12px;border-radius:4px;font:700 14px Rajdhani,sans-serif}
+.sub button.on{color:var(--acc2);border-color:var(--acc2);box-shadow:0 0 10px rgba(0,240,255,.4)}
+.pop{position:fixed;left:50%;top:80px;transform:translateX(-50%);background:var(--gold);color:#000;font-weight:700;padding:8px 16px;border-radius:4px;z-index:60;box-shadow:0 0 22px var(--gold);animation:up 1.5s forwards}
+@keyframes up{to{top:50px;opacity:0}}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.wt{width:80px!important;margin:0!important;padding:8px!important}
+.slot{flex:1;background:rgba(26,16,56,.6);border:1px dashed var(--acc2);border-radius:6px;padding:10px 6px;text-align:center;min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:14px}
+.slot .pic{height:64px;font-size:40px}
+.slot .pic img{max-height:64px}
+.mult{display:flex;gap:6px;margin-top:10px}
+.mult button{flex:1;background:#07040f;border:1px solid var(--line);color:var(--acc2);font:700 15px Rajdhani,sans-serif;padding:9px 0;border-radius:4px}
+.wheelwrap{display:flex;justify-content:center;margin:16px 0}
+.wheel{position:relative;width:min(300px,78vw);aspect-ratio:1;border-radius:50%;border:4px solid var(--acc2);box-shadow:0 0 26px rgba(0,240,255,.6),0 0 60px rgba(255,43,214,.35),inset 0 0 20px #000}
+.arrow{position:absolute;inset:0}
+.arrow i{position:absolute;left:50%;top:-8px;height:calc(50% + 8px);width:4px;margin-left:-2px;background:var(--gold);border-radius:2px;box-shadow:0 0 10px var(--gold)}
+.arrow i:before{content:'';position:absolute;top:-6px;left:-6px;border:8px solid transparent;border-bottom:14px solid var(--gold);border-top:0;filter:drop-shadow(0 0 6px var(--gold))}
+.wc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:40%;aspect-ratio:1;border-radius:50%;background:var(--card);border:2px solid var(--acc);box-shadow:0 0 16px rgba(255,43,214,.6),inset 0 0 12px rgba(255,43,214,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:20px;line-height:1.2}
+.mult button.qon{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 0 12px rgba(255,43,214,.6)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.rc{background:#07040f;border:1px solid var(--line);border-radius:6px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;box-shadow:0 0 10px rgba(0,240,255,.15)}
+.rc .pic{height:56px;font-size:34px}
+.rc .pic img{max-height:56px}
+.win.mini{height:84px}
+.win.mini .it{font-size:32px}
+.qty{display:flex;align-items:center;gap:8px;flex:none}
+.qty button{width:32px;height:32px;border-radius:4px;border:1px solid var(--acc2);background:#07040f;color:var(--acc2);font:700 18px Rajdhani,sans-serif}
+.qty b{min-width:18px;text-align:center}
+.coins .plus{color:var(--acc2);text-shadow:0 0 8px var(--acc2);margin-left:2px}
+.prof{display:flex;align-items:center;gap:14px}
+.av{width:64px;height:64px;border-radius:50%;border:2px solid var(--acc2);box-shadow:0 0 14px rgba(0,240,255,.55);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;flex:none;background:#07040f}
+.av img{width:100%;height:100%;object-fit:cover}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 4px;text-align:center}
+.stats b{display:block;font-size:18px;color:var(--acc2);text-shadow:0 0 8px rgba(0,240,255,.5)}
+.stats span{font-size:12px;color:var(--mut)}
+#up .card{padding:8px;margin:6px 0}
+#up .slot{min-height:84px;padding:6px 4px;font-size:12px;gap:2px}
+#up .slot .pic{height:40px;font-size:28px}
+#up .slot .pic img{max-height:40px}
+#up .mult{margin-top:6px;gap:4px}
+#up .mult button{padding:5px 0;font-size:13px}
+#up .wheelwrap{margin:8px 0}
+#up .wheel{width:min(190px,52vw);border-width:3px}
+#up .wc{font-size:15px}
+#up .btn{padding:9px 12px}
+#up h3{margin:8px 0 4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+#wall{position:fixed;inset:0;z-index:-1;background:center/cover no-repeat;display:none}
+#wall::after{content:"";position:absolute;inset:0;background:rgba(7,4,15,.45)}
+.bar2{height:6px;background:#07040f;border:1px solid var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar2 i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+</style>
+</head>
+<body>
+<div id="wall"></div>
+<header>
+  <div class="logo" id="logo">BRAINROT GAME</div>
+  <div class="coins" id="topup" style="cursor:pointer">🪙 <span id="coins">0</span> <b class="plus">＋</b></div>
+</header>
+<main>
+  <section class="tab on" id="t-cases"><h3>Кейсы</h3><div id="cases"></div></section>
+  <section class="tab" id="t-inv"><h3>Профиль</h3><div id="prof"></div><div class="card" id="promo-card"><b>🎁 Промокод</b><input id="promo-in" placeholder="Введи промокод" autocapitalize="characters" autocomplete="off"><button class="btn" id="promo-go" style="margin-top:8px">Активировать</button></div><div class="card" id="wall-card"><b>🖼 Обои</b><div class="mut" style="margin:4px 0 8px">Выбери картинку из галереи, она станет фоном игры.</div><input type="file" id="wall-file" accept="image/*" style="display:none"><div style="display:flex;gap:8px"><button class="btn" id="wall-pick" style="flex:1">Выбрать фото</button><button class="btn alt" id="wall-clear" style="flex:1">Убрать</button></div></div><div class="row" style="margin:16px 0 4px"><h3 style="margin:0">Инвентарь</h3><button class="btn sm" id="sellall">Продать все</button></div><div id="inv"></div></section>
+  <section class="tab" id="t-up"><h3>Апгрейдер</h3><div id="up"></div></section>
+  <section class="tab" id="t-admin">
+    <div class="card" id="a-login"><h3>🔐 Админка</h3><input id="pin" type="password" placeholder="PIN"><button class="btn" id="pinbtn">Войти</button></div>
+    <div id="a-panel" style="display:none">
+      <div class="sub" id="asub">
+        <button data-s="items" class="on">Брейнроты</button><button data-s="cases">Кейсы</button><button data-s="dep">Пополнение</button><button data-s="coins">Монеты</button><button data-s="promo">Промокоды</button><button data-s="backup">Бэкап</button><button data-s="admins" id="asub-admins">Админы</button>
+      </div>
+      <div id="a-body"></div>
+    </div>
+  </section>
+</main>
+<nav>
+  <button class="on" data-t="cases"><span>📦</span>Кейсы</button>
+  <button data-t="inv"><span>👤</span>Профиль</button>
+  <button data-t="up"><span>🎰</span>Апгрейд</button>
+</nav>
+
+<script>
+const ADMIN_TG="Nohifo"; // username админа в Telegram без @
+const MIN_DEPOSIT=50; // пополнение брейнротами от этой стоимости
+const MIN_WITHDRAW=50; // вывод доступен для брейнротов от этой стоимости
+const API_URL=""; // https-адрес сервера бота, например https://bot.example.com (нужен для выдачи монет)
+const SHARE_URL=""; // ссылка, которую игроки пересылают, например https://t.me/ИМЯ_БОТА (пусто = адрес этой страницы)
+const SHARE_TEXT="🎁 Залетай в игру, открывай кейсы и выбивай брейнротов!";
+const OWNER_TG="Nohifo"; // создатель: username в Telegram без @ (можно назначать админов)
+const ADMIN_PIN="838995"; // ПОМЕНЯЙ PIN
+const RAR={common:['Обычный','#4d8dff'],rare:['Редкий','#39ff88'],epic:['Эпик','#ff2bd6'],legend:['Легенда','#f8ff3d'],mythic:['Мифик','#ff3b5c']};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const fmt=n=>Number(n).toLocaleString('ru');
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+let DB=load('bs_db',{items:[],cases:[]}),P=load('bs_p',{coins:0,inv:{}});
+DB.dep=DB.dep||[];DB.admins=DB.admins||[];DB.promos=DB.promos||[];
+P.cd=P.cd||{};P.promosUsed=P.promosUsed||[];P.shares=P.shares||{};
+function cdLeft(c){return c.cooldown>0?Math.max(0,c.cooldown*3600000-(Date.now()-(P.cd[c.id]||0))):0}
+function fmtT(ms){const m=Math.ceil(ms/60000),h=Math.floor(m/60);return h?`${h} ч ${m%60} мин`:`${m} мин`}
+function tgUser(){try{return window.Telegram.WebApp.initDataUnsafe.user||null}catch(e){return null}}
+function nickOk(c){if(!c.requireTag)return true;const u=tgUser();if(!u)return false;const s=[u.first_name,u.last_name,u.username].filter(Boolean).join(' ').toLowerCase();return s.includes(c.requireTag.toLowerCase())}
+const shareNeed=c=>Math.max(0,parseInt(c.reposts,10)||0);
+const shareHave=c=>(P.shares&&P.shares[c.id])||0;
+const shareOk=c=>shareHave(c)>=shareNeed(c);
+function lockMsg(c){if(cdLeft(c)>0)return '⏳ Доступен через '+fmtT(cdLeft(c));if(!nickOk(c))return tgUser()?'🔒 Добавь «'+c.requireTag+'» в ник Telegram':'🔒 Открой сайт через Telegram';if(!shareOk(c))return '📤 Нужно репостов: '+shareHave(c)+' из '+shareNeed(c);return ''}
+function saveDB(){try{localStorage.setItem('bs_db',JSON.stringify(DB))}catch(e){pop('Память заполнена: картинки слишком тяжёлые')}}
+function saveP(){try{localStorage.setItem('bs_p',JSON.stringify(P))}catch(e){}}
+const item=id=>DB.items.find(i=>i.id===id);
+function pop(t){const d=document.createElement('div');d.className='pop';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}
+function coins(){$('coins').textContent=fmt(P.coins)}
+document.addEventListener('DOMContentLoaded',()=>{const t=document.getElementById('topup');if(t)t.onclick=()=>topupModal()});
+function pic(img,emo){return img?`<img src="${img}">`:emo}
+function modal(html){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="box">${html}</div>`;document.body.appendChild(m);return m}
+function readImg(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/webp',.9))};im.src=r.result};r.readAsDataURL(file)})}
+
+// ===== игрок: кейсы =====
+function caseItems(c){return c.drops.filter(d=>item(d.itemId))}
+function caseTop(c){const o=Object.keys(RAR);return caseItems(c).map(d=>item(d.itemId)).sort((a,b)=>o.indexOf(b.rarity)-o.indexOf(a.rarity)||b.value-a.value)[0]}
+function renderCases(){
+  if(!DB.cases.length){$('cases').innerHTML='<div class="empty">Кейсов пока нет.<br>Открой админку: 5 тапов по логотипу.</div>';return}
+  $('cases').className='grid';
+  $('cases').innerHTML=DB.cases.map(c=>{const t=caseTop(c),mx=caseItems(c).reduce((m,d)=>Math.max(m,item(d.itemId).value),0);
+    return `<div class="cc" data-c="${c.id}"><i class="bar" style="background:${t?RAR[t.rarity][1]:'#555'}"></i><div class="pic">${pic(c.img,'📦')}</div><b>${esc(c.name)}</b><div class="mut">до ${fmt(mx)}</div><div class="price">${cdLeft(c)>0?'⏳ '+fmtT(cdLeft(c)):!nickOk(c)?'🔒 Нужен ник':!shareOk(c)?'📤 '+shareHave(c)+'/'+shareNeed(c)+' репостов':(c.price?'🪙 '+fmt(c.price):'Бесплатно')}</div></div>`}).join('');
+  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>showCase(DB.cases.find(c=>c.id===b.dataset.c)));
+}
+function pcts(c){const sum=caseItems(c).reduce((s,d)=>s+d.weight,0);return caseItems(c).map(d=>({it:item(d.itemId),p:d.weight/sum*100,w:d.weight}))}
+function openLbl(c,q){return c.price?'Открыть'+(q>1?' ×'+q:'')+' за 🪙 '+fmt(c.price*q):(q>1?'Открыть ×'+q+' бесплатно':'Открыть бесплатно')}
+function showCase(c){
+  const canMulti=!(c.cooldown>0)&&!(c.reposts>0);let qty=1;
+  const rows=pcts(c).sort((a,b)=>b.p-a.p).map(r=>`<div class="ch"><div class="l"><div class="th">${pic(r.it.img,'👾')}</div><div style="min-width:0"><b>${esc(r.it.name)}</b><br><span class="tag" style="color:${RAR[r.it.rarity][1]}">${RAR[r.it.rarity][0]}</span> <span class="mut">🪙 ${fmt(r.it.value)}</span></div></div><b>${r.p.toFixed(r.p<1?2:1)}%</b></div>`).join('');
+  const m=modal(`<div class="card"><div style="text-align:center"><div class="pic" style="height:120px">${pic(c.img,'📦')}</div><b style="font-size:20px">${esc(c.name)}</b></div><h3>Что внутри</h3>${rows||'<div class="mut">Кейс пустой</div>'}${canMulti?`<div class="mult" id="qs">${[1,3,5].map(n=>`<button data-q="${n}" class="${n===1?'qon':''}">${n} ${n===1?'кейс':'кейса'}</button>`).join('')}</div>`:''}${c.reposts>0?'<div class="card" id="sh" style="margin:12px 0 0"></div>':''}<button class="btn" id="o" style="margin-top:12px" ${rows&&!lockMsg(c)?'':'disabled'}>${esc(lockMsg(c))||openLbl(c,1)}</button><button class="btn alt" id="x" style="margin-top:8px">Закрыть</button></div>`);
+  $('x').onclick=()=>m.remove();
+  m.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{qty=+b.dataset.q;m.querySelectorAll('[data-q]').forEach(x=>x.classList.toggle('qon',x===b));if(!lockMsg(c))$('o').textContent=openLbl(c,qty)});
+  const refreshO=()=>{const lk=lockMsg(c);$('o').disabled=!(rows&&!lk);$('o').textContent=lk||openLbl(c,qty)};
+  const drawSh=()=>{const sh=$('sh');if(!sh)return;const n=shareNeed(c),h=Math.min(n,shareHave(c));sh.innerHTML=`<b>📤 Репосты: ${h} из ${n}</b><div class="bar2"><i style="width:${n?h/n*100:0}%"></i></div><div class="mut" style="margin:6px 0">Перешли ссылку на игру друзьям в чат. Каждая отправка засчитывается.</div><button class="btn alt" id="shb">${h>=n?'✅ Готово':'Переслать ссылку'}</button>`;$('shb').disabled=h>=n;$('shb').onclick=()=>{if(shareLink(c))pop('Репост засчитан: '+shareHave(c)+' из '+n);drawSh();refreshO()}};
+  drawSh();
+  $('o').onclick=()=>{m.remove();openCase(c,qty)};
+}
+function pick(c){const l=caseItems(c),sum=l.reduce((s,d)=>s+d.weight,0);let x=Math.random()*sum;for(const d of l){x-=d.weight;if(x<0)return item(d.itemId)}return item(l[0].itemId)}
+let busy=false;
+function openMulti(c,q){
+  const lk=lockMsg(c);if(lk)return pop(lk);
+  if(P.coins<c.price*q)return pop('Не хватает монет');
+  busy=true;P.coins-=c.price*q;saveP();coins();
+  const N=40,POS=34,wins=[],lists=[];
+  for(let k=0;k<q;k++){const w=pick(c),l=[];for(let i=0;i<N;i++)l.push(i===POS?w:pick(c));wins.push(w);lists.push(l)}
+  wins.forEach(w=>{P.inv[w.id]=(P.inv[w.id]||0)+1;noteDrop(w)});saveP();
+  const total=wins.reduce((t,w)=>t+w.value,0);
+  const m=modal(`<div style="text-align:center;font-weight:800;margin-bottom:10px">${esc(c.name)} ×${q}</div>${lists.map(l=>`<div class="win mini" style="margin-bottom:8px"><div class="strip mstrip">${l.map(i=>`<div class="it">${pic(i.img,'👾')}</div>`).join('')}</div></div>`).join('')}<div id="rres" style="margin-top:12px;text-align:center"><button class="btn alt sm" id="skip">Пропустить ⏩</button></div>`);
+  const w0=Math.min(520,innerWidth-32),tgs=lists.map(()=>POS*90+45-w0/2+(Math.random()*40-20));
+  const strips=m.querySelectorAll('.mstrip');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>strips.forEach((st,i)=>st.style.transform=`translateX(-${tgs[i]}px)`)));
+  let done=false,tm;
+  const reveal=()=>{
+    if(done)return;done=true;clearTimeout(tm);
+    $('rres').innerHTML=`<div class="rgrid">${wins.map(w=>`<div class="rc" style="border-color:${RAR[w.rarity][1]}"><div class="pic">${pic(w.img,'👾')}</div><b>${esc(w.name)}</b><span class="mut">🪙 ${fmt(w.value)}</span></div>`).join('')}</div><div class="mut" style="margin:10px 0">Всего на 🪙 ${fmt(total)}</div><button class="btn" id="k">Забрать всё</button><button class="btn alt" id="s" style="margin-top:8px">Продать всё за 🪙 ${fmt(total)}</button>`;
+    $('k').onclick=()=>{m.remove();busy=false};
+    $('s').onclick=()=>{wins.forEach(w=>{P.inv[w.id]--;if(P.inv[w.id]<=0)delete P.inv[w.id]});P.coins+=total;saveP();coins();pop('+'+fmt(total)+' 🪙');m.remove();busy=false};
+  };
+  tm=setTimeout(reveal,4500);
+  $('skip').onclick=()=>{strips.forEach((st,i)=>{st.style.transition='none';st.style.transform=`translateX(-${tgs[i]}px)`});reveal()};
+}
+function openCase(c,q=1){
+  if(busy)return;
+  if(q>1)return openMulti(c,q);
+  const lk=lockMsg(c);if(lk)return pop(lk);
+  if(P.coins<c.price)return pop('Не хватает монет');
+  busy=true;P.coins-=c.price;if(c.cooldown>0)P.cd[c.id]=Date.now();if(c.reposts>0){P.shares=P.shares||{};P.shares[c.id]=0}saveP();coins();
+  const N=40,POS=34,win=pick(c),list=[];for(let i=0;i<N;i++)list.push(i===POS?win:pick(c));
+  const m=modal(`<div style="text-align:center;font-weight:800;margin-bottom:12px">${esc(c.name)}</div><div class="win"><div class="strip" id="rstrip">${list.map(i=>`<div class="it">${pic(i.img,'👾')}</div>`).join('')}</div></div><div id="rres" style="margin-top:22px;text-align:center;min-height:110px"><button class="btn alt sm" id="skip">Пропустить ⏩</button></div>`);
+  const w=Math.min(520,innerWidth-32),tg=POS*90+45-w/2+(Math.random()*40-20);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('rstrip').style.transform=`translateX(-${tg}px)`));
+  let done=false,tm;
+  const reveal=()=>{
+    if(done)return;done=true;clearTimeout(tm);
+    P.inv[win.id]=(P.inv[win.id]||0)+1;noteDrop(win);saveP();
+    $('rres').innerHTML=`<div class="pic" style="height:110px">${pic(win.img,'👾')}</div><b>${esc(win.name)}</b> <span class="tag" style="color:${RAR[win.rarity][1]}">${RAR[win.rarity][0]}</span><div class="mut" style="margin:6px 0 12px">Стоимость 🪙 ${fmt(win.value)}</div><button class="btn" id="k">Забрать</button><button class="btn alt" id="s" style="margin-top:8px">Продать за 🪙 ${fmt(win.value)}</button>`;
+    $('k').onclick=()=>{m.remove();busy=false};
+    $('s').onclick=()=>{P.inv[win.id]--;if(P.inv[win.id]<=0)delete P.inv[win.id];P.coins+=win.value;saveP();coins();pop('+'+fmt(win.value)+' 🪙');m.remove();busy=false};
+  };
+  tm=setTimeout(reveal,4500);
+  $('skip').onclick=()=>{const st=$('rstrip');st.style.transition='none';st.style.transform=`translateX(-${tg}px)`;reveal()};
+}
+
+// ===== игрок: инвентарь =====
+function noteDrop(it){if(!it)return;if(!P.best||it.value>P.best.value){P.best={id:it.id,name:it.name,value:it.value,rarity:it.rarity,img:it.img};saveP()}}
+function renderProfile(){
+  if(!$('prof'))return;
+  const u=tgUser(),ids=Object.keys(P.inv).filter(id=>item(id));
+  const cnt=ids.reduce((t,id)=>t+P.inv[id],0),val=ids.reduce((t,id)=>t+item(id).value*P.inv[id],0);
+  const name=u?[u.first_name,u.last_name].filter(Boolean).join(' ')||'Игрок':'Игрок',b=P.best,rc=b?(RAR[b.rarity]||RAR.common):null;
+  const av=u&&u.photo_url?`<img src="${esc(u.photo_url)}">`:'👤';
+  $('prof').innerHTML=`<div class="card prof"><div class="av">${av}</div><div style="min-width:0"><b style="font-size:19px">${esc(name)}</b><br><b style="color:var(--acc2)">${u&&u.username?'@'+esc(u.username):(u?'ник не задан':'открыто вне Telegram')}</b><br><span class="mut" id="accno" style="cursor:pointer">Аккаунт №${accNo()} · нажми, чтобы скопировать</span></div></div>
+  <div class="stats"><div><b>${fmt(P.coins)}</b><span>монет</span></div><div><b>${cnt}</b><span>брейнротов</span></div><div><b>${fmt(val)}</b><span>в инвентаре</span></div></div>
+  <div class="card best" style="${b?`border-color:${rc[1]};box-shadow:0 0 18px ${rc[1]}55`:''}"><b style="color:var(--gold)">🏆 Лучший дроп</b>${b?`<div class="row" style="margin-top:8px"><div class="l"><div class="th" style="width:64px;height:64px;font-size:34px">${pic(b.img,'👾')}</div><div style="min-width:0"><b style="font-size:17px">${esc(b.name)}</b><br><span class="tag" style="color:${rc[1]}">${rc[0]}</span> <span class="mut">🪙 ${fmt(b.value)}</span></div></div></div>`:'<div class="mut" style="margin-top:6px">Пока ничего не выпало. Открой кейс!</div>'}</div>`;
+  $('accno').onclick=()=>{try{navigator.clipboard.writeText(accNo());pop('Номер скопирован')}catch(e){pop('№ '+accNo())}};
+}
+function renderInv(){
+  renderProfile();
+  const ids=Object.keys(P.inv).filter(id=>item(id));
+  if(!ids.length){$('inv').innerHTML='<div class="empty">Пока пусто. Открой кейс!</div>';$('sellall').style.display='none';return}
+  $('sellall').style.display='';
+  const allVal=ids.reduce((t,id)=>t+item(id).value*P.inv[id],0);
+  $('inv').innerHTML=ids.map(id=>{const i=item(id),n=P.inv[id];
+    return `<div class="card" style="border-color:${RAR[i.rarity][1]}"><div class="row"><div class="l"><div class="th">${pic(i.img,'👾')}</div><div style="min-width:0"><b>${esc(i.name)}</b> <span class="tag">×${n}</span><br><span class="mut">🪙 ${fmt(i.value)}</span></div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn sm" data-s1="${id}">Продать 1</button>${n>1?`<button class="btn sm alt" data-sa="${id}">Все ×${n}</button>`:''}${i.value>=MIN_WITHDRAW?`<button class="btn sm alt" data-w="${id}">Вывод</button>`:`<button class="btn sm alt" disabled style="opacity:.45" title="Вывод от ${MIN_WITHDRAW} монет">Вывод от ${MIN_WITHDRAW}</button>`}</div></div></div>`}).join('');
+  const sell=(id,n)=>{const i=item(id),g=i.value*n;P.inv[id]-=n;if(P.inv[id]<=0)delete P.inv[id];P.coins+=g;saveP();coins();pop('+'+fmt(g)+' 🪙');renderInv()};
+  document.querySelectorAll('[data-s1]').forEach(b=>b.onclick=()=>sell(b.dataset.s1,1));
+  document.querySelectorAll('[data-sa]').forEach(b=>b.onclick=()=>sell(b.dataset.sa,P.inv[b.dataset.sa]));
+  document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>withdrawModal(b.dataset.w));
+  $('sellall').onclick=()=>{
+    const m=modal(`<div class="card" style="text-align:center"><h3>Продать всё?</h3><div class="mut" style="margin-bottom:12px">Все брейнроты из инвентаря будут проданы за 🪙 ${fmt(allVal)}.</div><button class="btn" id="sa-ok">Продать все</button><button class="btn alt" id="sa-x" style="margin-top:8px">Отмена</button></div>`);
+    $('sa-x').onclick=()=>m.remove();
+    $('sa-ok').onclick=()=>{ids.forEach(id=>{delete P.inv[id]});P.coins+=allVal;saveP();coins();pop('+'+fmt(allVal)+' 🪙');m.remove();renderInv()};
+  };
+}
+
+
+// ===== мистери =====
+const MIN_MYSTERY=20; // минимальная стоимость брейнрота для мистери
+let UPMODE='up',MY=null;
+function upTabs(){return `<div class="sub" id="uptabs"><button data-um="up" class="${UPMODE==='up'?'on':''}">Апгрейд</button><button data-um="mys" class="${UPMODE==='mys'?'on':''}">Мистери</button></div>`}
+function bindUpTabs(){document.querySelectorAll('[data-um]').forEach(b=>b.onclick=()=>{if(busy)return;UPMODE=b.dataset.um;renderUp()})}
+function renderUp(){if(!$('up'))return;if(UPMODE==='mys')renderMystery();else renderUpgrade()}
+function mysPick(){ // дешёвые выпадают чаще, дорогие реже
+  const l=DB.items,w=l.map(i=>1/Math.max(i.value,1)),sum=w.reduce((a,b)=>a+b,0);let x=Math.random()*sum;
+  for(let k=0;k<l.length;k++){x-=w[k];if(x<0)return l[k]}return l[l.length-1];
+}
+function renderMystery(){
+  if(MY&&!(P.inv[MY]&&item(MY)))MY=null;
+  const me=MY?item(MY):null;
+  $('up').innerHTML=upTabs()+`<div class="card"><div class="mut" style="margin-bottom:8px">Закинь брейнрота от ${MIN_MYSTERY} 🪙 и получи случайного. Выпасть может и дороже, и дешевле.</div><div style="display:flex;align-items:center;gap:8px"><div class="slot" id="my-slot">${me?`<div class="pic">${pic(me.img,'👾')}</div><b>${esc(me.name)}</b><span class="mut">🪙 ${fmt(me.value)}</span>`:`<div class="pic">➕</div><span class="mut">Твой брейнрот</span>`}</div><div style="font-size:20px">➜</div><div class="slot" style="cursor:default"><div class="pic">❓</div><span class="mut">Случайный</span></div></div></div><button class="btn" id="my-go" ${me&&!busy?'':'disabled'}>Открыть мистери</button>`;
+  bindUpTabs();
+  $('my-slot').onclick=()=>{if(busy)return;pickModal('Что закинуть (от '+MIN_MYSTERY+' 🪙)',Object.keys(P.inv).filter(id=>item(id)&&item(id).value>=MIN_MYSTERY).map(id=>({it:item(id),n:P.inv[id]})),id=>{MY=id;renderMystery()})};
+  $('my-go').onclick=mysterySpin;
+}
+function mysterySpin(){
+  if(busy||!MY)return;const me=item(MY);
+  if(!me||!P.inv[MY])return;if(me.value<MIN_MYSTERY)return pop('Нужен брейнрот от '+MIN_MYSTERY+' 🪙');
+  const N=40,POS=34,win=mysPick(),list=[];for(let i=0;i<N;i++)list.push(i===POS?win:DB.items[Math.floor(Math.random()*DB.items.length)]);
+  busy=true;
+  P.inv[me.id]--;if(P.inv[me.id]<=0)delete P.inv[me.id];
+  P.inv[win.id]=(P.inv[win.id]||0)+1;noteDrop(win);saveP();
+  MY=P.inv[me.id]?me.id:null;
+  const m=modal(`<div style="text-align:center;font-weight:800;margin-bottom:12px">Мистери</div><div class="win"><div class="strip" id="ystrip">${list.map(i=>`<div class="it">${pic(i.img,'👾')}</div>`).join('')}</div></div><div id="yres" style="margin-top:22px;text-align:center;min-height:110px"><button class="btn alt sm" id="yskip">Пропустить ⏩</button></div>`);
+  const w0=Math.min(520,innerWidth-32),tg=POS*90+45-w0/2+(Math.random()*40-20);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('ystrip').style.transform=`translateX(-${tg}px)`));
+  let done=false,tm;
+  const reveal=()=>{
+    if(done)return;done=true;clearTimeout(tm);
+    const d=win.value-me.value,col=d>=0?'var(--grn)':'var(--red)';
+    $('yres').innerHTML=`<div class="pic" style="height:110px">${pic(win.img,'👾')}</div><b>${esc(win.name)}</b> <span class="tag" style="color:${RAR[win.rarity][1]}">${RAR[win.rarity][0]}</span><div class="mut" style="margin:6px 0 4px">Стоимость 🪙 ${fmt(win.value)}</div><div style="font-weight:900;color:${col};margin-bottom:12px">${d>=0?'+':''}${fmt(d)} 🪙 к ${esc(me.name)}</div><button class="btn" id="yok">Забрать</button>`;
+    $('yok').onclick=()=>{m.remove();busy=false;renderUp();renderInv()};
+  };
+  tm=setTimeout(reveal,4500);
+  $('yskip').onclick=()=>{const st=$('ystrip');st.style.transition='none';st.style.transform=`translateX(-${tg}px)`;reveal()};
+}
+
+// ===== пополнение и вывод (заявка админу в Telegram) =====
+function accNo(){const u=tgUser();if(u&&u.id)return String(u.id);if(!P.acc){P.acc=String(100000+Math.floor(Math.random()*900000));saveP()}return P.acc}
+function whoAmI(){const u=tgUser();return (u&&u.username?'@'+u.username+', ':'')+'аккаунт №'+accNo()}
+function openTg(url){
+  try{if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openTelegramLink)return Telegram.WebApp.openTelegramLink(url)}catch(e){}
+  window.open(url,'_blank');
+}
+function shareLink(c){
+  const url=SHARE_URL||location.href.split('#')[0];
+  openTg('https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(SHARE_TEXT));
+  const now=Date.now();
+  if(now-(P.lastShare||0)<5000)return false; // защита от быстрых повторных нажатий
+  P.lastShare=now;P.shares=P.shares||{};
+  P.shares[c.id]=Math.min(shareNeed(c),shareHave(c)+1);saveP();return true;
+}
+function sendToAdmin(text){
+  const url='https://t.me/'+ADMIN_TG+'?text='+encodeURIComponent(text);
+  try{if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openTelegramLink)return Telegram.WebApp.openTelegramLink(url)}catch(e){}
+  window.open(url,'_blank');
+}
+function sendRequest(kind,itemsText,total){
+  const W=window.Telegram&&Telegram.WebApp;
+  // sendData работает, только если игру открыли кнопкой «Играть» из бота (у неё нет query_id)
+  const viaBot=!!(W&&W.initData&&!(W.initDataUnsafe&&W.initDataUnsafe.query_id));
+  if(viaBot){try{pop('Заявка отправлена');W.sendData(JSON.stringify({k:kind,items:String(itemsText).slice(0,600),total:total|0,acc:accNo()}));return true}catch(e){}}
+  pop('Открой игру кнопкой «Играть» из бота, чтобы заявка попала в бота');
+  sendToAdmin((kind==='dep'?'Хочу пополнить брейнротами: ':'Заявка на вывод: ')+itemsText+' (всего '+total+' монет). Игрок: '+whoAmI());
+  return false;
+}
+function topupModal(){
+  const list=DB.dep.filter(o=>o.value>=MIN_DEPOSIT),sel={};
+  const m=modal(`<div class="card"><h3>Пополнить брейнротами</h3><div class="mut">Выбери брейнротов и количество (от 1 до 10 штук). Заявка уйдёт админу в бота.</div><div id="tp-list" style="margin-top:8px"></div><div class="mut" id="tp-tot" style="text-align:center;margin:8px 0"></div><button class="btn" id="tp-go">Отправить заявку</button><button class="btn alt" id="tp-x" style="margin-top:8px">Закрыть</button></div>`);
+  const draw=()=>{
+    $('tp-list').innerHTML=list.length?list.map(o=>`<div class="ch"><div class="l"><div class="th">${pic(o.img,'👾')}</div><div style="min-width:0"><b>${esc(o.name)}</b><br><span class="mut">🪙 ${fmt(o.value)} за штуку</span></div></div><div class="qty"><button data-dm="${o.id}">−</button><b>${sel[o.id]||0}</b><button data-dp="${o.id}">+</button></div></div>`).join(''):`<div class="empty">Пока нет брейнротов для пополнения</div>`;
+    const cnt=Object.values(sel).reduce((t,n)=>t+n,0),val=list.reduce((t,o)=>t+o.value*(sel[o.id]||0),0);
+    $('tp-tot').textContent=cnt?`Выбрано: ${cnt} шт. на 🪙 ${fmt(val)}`:'Ничего не выбрано';
+    m.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>{const id=b.dataset.dm;if(sel[id]>0){sel[id]--;if(!sel[id])delete sel[id]}draw()});
+    m.querySelectorAll('[data-dp]').forEach(b=>b.onclick=()=>{const id=b.dataset.dp;if((sel[id]||0)<10)sel[id]=(sel[id]||0)+1;else pop('Максимум 10 шт.');draw()});
+  };
+  draw();
+  $('tp-x').onclick=()=>m.remove();
+  $('tp-go').onclick=()=>{
+    const ids=Object.keys(sel);if(!ids.length)return pop('Выбери брейнротов');
+    const val=ids.reduce((t,id)=>t+list.find(o=>o.id===id).value*sel[id],0);
+    const txt=ids.map(id=>list.find(o=>o.id===id).name+' ×'+sel[id]).join(', ');
+    m.remove();sendRequest('dep',txt,val);
+  };
+}
+function withdrawModal(id){
+  const i=item(id);if(!i||!P.inv[id])return;
+  if(i.value<MIN_WITHDRAW)return pop('Вывод от '+MIN_WITHDRAW+' монет');
+  const m=modal(`<div class="card" style="text-align:center"><h3>Вывод</h3><div class="pic" style="height:90px">${pic(i.img,'👾')}</div><b>${esc(i.name)}</b><div class="mut" style="margin:6px 0 12px">🪙 ${fmt(i.value)}. Брейнрот спишется из инвентаря, заявка уйдёт админу в бота.</div><button class="btn" id="wd-go">Подать заявку</button><button class="btn alt" id="wd-x" style="margin-top:8px">Отмена</button></div>`);
+  $('wd-x').onclick=()=>m.remove();
+  $('wd-go').onclick=()=>{
+    P.inv[id]--;if(P.inv[id]<=0)delete P.inv[id];saveP();m.remove();renderInv();
+    sendRequest('wd',i.name,i.value);
+  };
+}
+
+// ===== апгрейдер =====
+const HOUSE=0.95; // шанс = цена_твоего / цена_цели * 0.95 (5% в пользу игры). Поставь 1, чтобы убрать.
+let UP={sel:{},tgt:null};
+function selCount(){return Object.values(UP.sel).reduce((t,n)=>t+n,0)}
+function selVal(){return Object.keys(UP.sel).reduce((t,id)=>t+(item(id)?item(id).value*UP.sel[id]:0),0)}
+function upChance(){if(!selCount()||!UP.tgt)return 0;const b=item(UP.tgt);if(!b||b.value<=0)return 0;return Math.min(95,Math.max(1,selVal()/b.value*100*HOUSE))}
+function pickModal(title,list,cb){
+  const m=modal(`<div class="card"><h3>${title}</h3>${list.map(r=>`<div class="ch" data-p="${r.it.id}" style="cursor:pointer"><div class="l"><div class="th">${pic(r.it.img,'👾')}</div><div style="min-width:0"><b>${esc(r.it.name)}</b>${r.n?` <span class="tag">×${r.n}</span>`:''}<br><span class="mut">🪙 ${fmt(r.it.value)}</span></div></div><span class="tag" style="color:${RAR[r.it.rarity][1]}">${RAR[r.it.rarity][0]}</span></div>`).join('')||'<div class="empty">Нечего выбрать</div>'}<button class="btn alt" id="x" style="margin-top:10px">Отмена</button></div>`);
+  m.querySelectorAll('[data-p]').forEach(r=>r.onclick=()=>{m.remove();cb(r.dataset.p)});$('x').onclick=()=>m.remove();
+}
+function pickMulti(){
+  const inv=Object.keys(P.inv).filter(id=>item(id)),sel={...UP.sel};
+  const m=modal(`<div class="card"><h3>Твои брейнроты</h3><div id="um-list"></div><div class="mut" id="um-tot" style="margin:8px 0;text-align:center"></div><button class="btn" id="um-ok">Готово</button><button class="btn alt" id="um-no" style="margin-top:8px">Отмена</button></div>`);
+  const draw=()=>{
+    $('um-list').innerHTML=inv.length?inv.map(id=>{const it=item(id),n=sel[id]||0;return `<div class="ch"><div class="l"><div class="th">${pic(it.img,'👾')}</div><div style="min-width:0"><b>${esc(it.name)}</b><br><span class="mut">🪙 ${fmt(it.value)} · есть ×${P.inv[id]}</span></div></div><div class="qty"><button data-qm="${id}">−</button><b>${n}</b><button data-qp="${id}">+</button></div></div>`}).join(''):'<div class="empty">Инвентарь пуст</div>';
+    const cnt=Object.values(sel).reduce((t,n)=>t+n,0),val=Object.keys(sel).reduce((t,id)=>t+item(id).value*sel[id],0);
+    $('um-tot').textContent=cnt?`Выбрано: ${cnt} шт. на 🪙 ${fmt(val)}`:'Ничего не выбрано';
+    m.querySelectorAll('[data-qm]').forEach(b=>b.onclick=()=>{const id=b.dataset.qm;if(sel[id]>0){sel[id]--;if(!sel[id])delete sel[id]}draw()});
+    m.querySelectorAll('[data-qp]').forEach(b=>b.onclick=()=>{const id=b.dataset.qp;if((sel[id]||0)<P.inv[id])sel[id]=(sel[id]||0)+1;draw()});
+  };
+  draw();
+  $('um-ok').onclick=()=>{UP.sel=sel;m.remove();renderUp()};
+  $('um-no').onclick=()=>m.remove();
+}
+function setMult(k){const v=selVal();if(!v)return;const c=DB.items.filter(i=>i.value>v).sort((a,b)=>Math.abs(a.value-v*k)-Math.abs(b.value-v*k))[0];if(!c)return pop('Нет подходящего брейнрота');UP.tgt=c.id;renderUp()}
+function renderUpgrade(){
+  if(!$('up'))return;
+  for(const id of Object.keys(UP.sel)){if(!item(id)||!P.inv[id])delete UP.sel[id];else if(UP.sel[id]>P.inv[id])UP.sel[id]=P.inv[id]}
+  const cnt=selCount(),val=selVal();
+  if(UP.tgt&&(!item(UP.tgt)||(cnt&&item(UP.tgt).value<=val)))UP.tgt=null;
+  const tg=UP.tgt?item(UP.tgt):null,ch=upChance();
+  const ids=Object.keys(UP.sel);
+  const mineSlot=cnt?`<div class="pic" style="gap:2px">${ids.slice(0,3).map(id=>pic(item(id).img,'👾')).join('')}</div><b>${cnt} шт.</b><span class="mut">🪙 ${fmt(val)}</span>`:`<div class="pic">➕</div><span class="mut">Твои брейнроты</span>`;
+  const tgtSlot=tg?`<div class="pic">${pic(tg.img,'👾')}</div><b>${esc(tg.name)}</b><span class="mut">🪙 ${fmt(tg.value)}</span>`:`<div class="pic">➕</div><span class="mut">Хочу получить</span>`;
+  $('up').innerHTML=upTabs()+`<div class="card"><div style="display:flex;align-items:center;gap:8px"><div class="slot" id="sm">${mineSlot}</div><div style="font-size:20px">➜</div><div class="slot" id="st">${tgtSlot}</div></div>
+  ${cnt?`<div class="mult"><button data-k="2">×2</button><button data-k="3">×3</button><button data-k="5">×5</button><button data-k="10">×10</button></div>`:''}</div>
+  <div class="wheelwrap"><div class="wheel" style="background:conic-gradient(#39ff88 0 ${ch*3.6}deg,#ff3b5c 0)"><div class="arrow" id="ar"><i></i></div><div class="wc"><b>${ch?ch.toFixed(1)+'%':'—'}</b><span class="mut">${cnt&&tg?'×'+(tg.value/Math.max(val,1)).toFixed(1):'шанс'}</span></div></div></div>
+  <button class="btn" id="spin" ${cnt&&tg&&!busy?'':'disabled'}>Крутить</button>
+  <div class="mut" style="text-align:center;margin-top:6px;font-size:12px">Выиграешь — получишь цель. Проиграешь — все выбранные брейнроты пропадут.</div>`;
+  $('sm').onclick=()=>{if(busy)return;pickMulti()};
+  $('st').onclick=()=>{if(busy)return;if(!cnt)return pop('Сначала выбери своих брейнротов');pickModal('Кого хочешь получить',DB.items.filter(i=>i.value>val).sort((a,b)=>a.value-b.value).map(it=>({it})),id=>{UP.tgt=id;renderUp()})};
+  document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{if(!busy)setMult(+b.dataset.k)});
+  $('spin').onclick=spin;
+  bindUpTabs();
+}
+function spin(){
+  if(busy)return;const ch=upChance();if(!ch||!selCount()||!UP.tgt)return;
+  const lost=Object.keys(UP.sel).map(id=>({id,n:UP.sel[id],it:item(id)})),tgtId=UP.tgt,win=Math.random()*100<ch,wd=ch*3.6;
+  const ang=win?2+Math.random()*(wd-4):wd+2+Math.random()*(360-wd-4);
+  busy=true;
+  lost.forEach(l=>{P.inv[l.id]-=l.n;if(P.inv[l.id]<=0)delete P.inv[l.id]});UP.sel={};saveP();
+  $('spin').disabled=true;
+  const ar=$('ar');ar.style.transition='transform 4.6s cubic-bezier(.12,.7,.1,1)';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>ar.style.transform=`rotate(${360*6+ang}deg)`));
+  setTimeout(()=>{
+    const t=item(tgtId),cnt=lost.reduce((x,l)=>x+l.n,0);
+    if(win){P.inv[tgtId]=(P.inv[tgtId]||0)+1;saveP()}
+    const body=win?`<div class="pic" style="height:110px;margin-top:8px">${pic(t.img,'👾')}</div><b>${esc(t.name)}</b>`:`<div class="pic" style="height:110px;margin-top:8px;gap:4px">${lost.slice(0,3).map(l=>pic(l.it.img,'👾')).join('')}</div><b>${cnt} шт.</b>`;
+    const m=modal(`<div class="card" style="text-align:center"><div style="font-size:22px;font-weight:900;color:${win?'var(--grn)':'var(--red)'}">${win?'🎉 Победа!':'💥 Не повезло'}</div>${body}<div class="mut" style="margin:6px 0 12px">${win?'Брейнрот добавлен в инвентарь':'Брейнроты потеряны'}</div><button class="btn" id="ok">Ок</button></div>`);
+    $('ok').onclick=()=>{m.remove();busy=false;renderUp();renderInv()};
+  },4900);
+}
+
+// ===== связь с сервером бота (выдача монет) =====
+async function apiCall(path,payload){
+  const W=window.Telegram&&Telegram.WebApp;
+  if(!API_URL)throw new Error('Не задан API_URL в коде игры');
+  if(!W||!W.initData)throw new Error('Открой игру из Telegram');
+  const r=await fetch(API_URL+path,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({initData:W.initData},payload||{}))});
+  let d={};try{d=await r.json()}catch(e){}
+  if(!r.ok)throw new Error(d.error||'Ошибка сервера');
+  return d;
+}
+let claiming=false;
+async function claimCredits(){
+  if(claiming||!API_URL)return;const W=window.Telegram&&Telegram.WebApp;if(!W||!W.initData)return;
+  claiming=true;
+  try{
+    P.seen=P.seen||[];
+    const d=await apiCall('/claim'),fresh=(d.credits||[]).filter(c=>!P.seen.includes(c.id));
+    if(fresh.length){
+      const sum=fresh.reduce((t,c)=>t+c.amount,0);
+      P.coins+=sum;fresh.forEach(c=>P.seen.push(c.id));P.seen=P.seen.slice(-300);saveP();coins();pop('+'+fmt(sum)+' 🪙 от создателя');
+      if(document.getElementById('prof'))renderProfile();
+    }
+    if((d.credits||[]).length)apiCall('/ack',{ids:d.credits.map(c=>c.id)}).catch(()=>{});
+  }catch(e){}
+  claiming=false;
+}
+setTimeout(claimCredits,600);setInterval(claimCredits,30000);
+
+// ===== роли =====
+let pinOK=false;
+const uname=()=>{const u=tgUser();return u&&u.username?u.username.toLowerCase():''};
+const isOwner=()=>pinOK||(uname()!==''&&uname()===OWNER_TG.toLowerCase());
+const isAdm=()=>isOwner()||(uname()!==''&&DB.admins.includes(uname()));
+
+// ===== промокоды =====
+const normCode=c=>String(c||'').trim().toUpperCase();
+function redeemPromo(){
+  const code=normCode($('promo-in').value);
+  if(!code)return pop('Введи промокод');
+  const pr=DB.promos.find(p=>p.code===code);
+  if(!pr)return pop('Промокод не найден');
+  P.promosUsed=P.promosUsed||[];
+  if(P.promosUsed.includes(pr.id))return pop('Ты уже использовал этот промокод');
+  if(pr.max>0&&(pr.used||0)>=pr.max)return pop('Промокод закончился');
+  P.coins+=pr.coins;P.promosUsed.push(pr.id);pr.used=(pr.used||0)+1;
+  saveP();saveDB();coins();$('promo-in').value='';
+  pop('+'+fmt(pr.coins)+' 🪙');
+  if(typeof renderAdmin==='function'&&isAdm())renderAdmin();
+}
+$('promo-go').onclick=redeemPromo;
+$('promo-in').onkeydown=e=>{if(e.key==='Enter')redeemPromo()};
+
+// ===== обои =====
+function applyWall(){const w=$('wall');let d='';try{d=localStorage.getItem('bs_wall')||''}catch(e){}w.style.backgroundImage=d?`url("${d}")`:'';w.style.display=d?'block':'none'}
+function readWall(file){return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8))};im.src=r.result};r.readAsDataURL(file)})}
+$('wall-pick').onclick=()=>$('wall-file').click();
+$('wall-file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(!f.type.startsWith('image/'))return pop('Выбери картинку');try{const d=await readWall(f);localStorage.setItem('bs_wall',d);applyWall();pop('Обои установлены')}catch(err){pop('Не удалось: картинка слишком тяжёлая')}};
+$('wall-clear').onclick=()=>{try{localStorage.removeItem('bs_wall')}catch(e){}applyWall();pop('Обои убраны')};
+applyWall();
+
+// ===== админка =====
+let sub='items';
+function renderAdmin(){
+  if(isAdm()){$('a-login').style.display='none';$('a-panel').style.display='block'}
+  $('asub-admins').style.display=isOwner()?'':'none';
+  if(sub==='admins'&&!isOwner())sub='items';
+  document.querySelectorAll('#asub button').forEach(b=>b.classList.toggle('on',b.dataset.s===sub));
+  const B=$('a-body');
+  if(sub==='items'){
+    B.innerHTML=`<button class="btn" id="ni">+ Добавить брейнрота</button>`+(DB.items.map(i=>`<div class="card"><div class="row"><div class="l"><div class="th">${pic(i.img,'👾')}</div><div style="min-width:0"><b>${esc(i.name)}</b><br><span class="tag" style="color:${RAR[i.rarity][1]}">${RAR[i.rarity][0]}</span> <span class="mut">🪙 ${fmt(i.value)}</span></div></div><div style="display:flex;gap:6px"><button class="btn sm alt" data-ei="${i.id}">✎</button><button class="btn sm del" data-di="${i.id}">🗑</button></div></div></div>`).join('')||'<div class="empty">Брейнротов нет</div>');
+    $('ni').onclick=()=>itemForm();
+    B.querySelectorAll('[data-ei]').forEach(b=>b.onclick=()=>itemForm(item(b.dataset.ei)));
+    B.querySelectorAll('[data-di]').forEach(b=>b.onclick=()=>{if(!confirm('Удалить брейнрота?'))return;const id=b.dataset.di;DB.items=DB.items.filter(i=>i.id!==id);DB.cases.forEach(c=>c.drops=c.drops.filter(d=>d.itemId!==id));delete P.inv[id];saveDB();saveP();renderAdmin()});
+  }
+  if(sub==='cases'){
+    B.innerHTML=`<button class="btn" id="nc">+ Добавить кейс</button>`+(DB.cases.map(c=>`<div class="card"><div class="row"><div class="l"><div class="th">${pic(c.img,'📦')}</div><div style="min-width:0"><b>${esc(c.name)}</b><br><span class="mut">🪙 ${fmt(c.price)} · ${c.drops.length} брейнротов${c.reposts>0?' · 📤 '+c.reposts+' репостов':''}</span></div></div><div style="display:flex;gap:6px"><button class="btn sm alt" data-ec="${c.id}">✎</button><button class="btn sm del" data-dc="${c.id}">🗑</button></div></div></div>`).join('')||'<div class="empty">Кейсов нет</div>');
+    $('nc').onclick=()=>{if(!DB.items.length)return pop('Сначала добавь брейнротов');caseForm()};
+    B.querySelectorAll('[data-ec]').forEach(b=>b.onclick=()=>caseForm(DB.cases.find(c=>c.id===b.dataset.ec)));
+    B.querySelectorAll('[data-dc]').forEach(b=>b.onclick=()=>{if(!confirm('Удалить кейс?'))return;DB.cases=DB.cases.filter(c=>c.id!==b.dataset.dc);saveDB();renderAdmin()});
+  }
+  if(sub==='dep'){
+    B.innerHTML=`<div class="mut" style="margin:6px 0">Брейнроты, которыми игрок может пополнять баланс (от ${MIN_DEPOSIT} 🪙). Игрок выбирает от 1 до 10 штук каждого.</div><button class="btn" id="nd">+ Добавить для пополнения</button>`+(DB.dep.map(o=>`<div class="card"><div class="row"><div class="l"><div class="th">${pic(o.img,'👾')}</div><div style="min-width:0"><b>${esc(o.name)}</b><br><span class="mut">🪙 ${fmt(o.value)} за штуку</span></div></div><div style="display:flex;gap:6px"><button class="btn sm alt" data-ed="${o.id}">✎</button><button class="btn sm del" data-dd="${o.id}">🗑</button></div></div></div>`).join('')||'<div class="empty">Пока ничего нет</div>');
+    $('nd').onclick=()=>depForm();
+    B.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>depForm(DB.dep.find(o=>o.id===b.dataset.ed)));
+    B.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>{if(!confirm('Удалить?'))return;DB.dep=DB.dep.filter(o=>o.id!==b.dataset.dd);saveDB();renderAdmin()});
+  }
+  if(sub==='admins'){
+    B.innerHTML=`<div class="card"><b>Назначить админа</b><div class="mut" style="margin:4px 0">Username в Telegram, без @. Админ получит доступ к панели, когда откроет игру из Telegram (5 тапов по логотипу).</div><input id="an" placeholder="username" autocapitalize="off" autocomplete="off"><button class="btn" id="aadd">Назначить</button></div><div class="card"><div class="row"><div class="l"><b>@${esc(OWNER_TG)}</b></div><span class="tag" style="color:var(--gold)">создатель</span></div></div>`+DB.admins.map(a=>`<div class="card"><div class="row"><div class="l"><b>@${esc(a)}</b></div><button class="btn sm del" data-ra="${esc(a)}">Снять</button></div></div>`).join('');
+    $('aadd').onclick=()=>{const u=$('an').value.trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{5,32}$/.test(u))return pop('Неверный username');if(u===OWNER_TG.toLowerCase()||DB.admins.includes(u))return pop('Уже есть');DB.admins.push(u);saveDB();pop('Назначен @'+u);renderAdmin()};
+    B.querySelectorAll('[data-ra]').forEach(b=>b.onclick=()=>{DB.admins=DB.admins.filter(a=>a!==b.dataset.ra);saveDB();renderAdmin()});
+  }
+  if(sub==='coins'){
+    B.innerHTML=(isOwner()?`<div class="card"><b>Выдать монеты игроку</b><div class="mut" style="margin:4px 0">Номер аккаунта из профиля игрока и сумма. Монеты придут ему, когда он откроет игру из Telegram.</div><input id="gacc" type="number" inputmode="numeric" placeholder="Номер аккаунта"><input id="gamt" type="number" inputmode="numeric" min="1" placeholder="Сколько монет"><button class="btn" id="ggive">Выдать игроку</button></div>`:'')+`<div class="card"><b>Выдать монеты на этом устройстве</b><input id="amt" type="number" placeholder="Сколько монет"><button class="btn" id="give">Выдать</button><button class="btn del" id="rst" style="margin-top:8px">Сбросить монеты и инвентарь</button></div>`;
+    if($('ggive'))$('ggive').onclick=async()=>{const acc=$('gacc').value.trim(),amt=parseInt($('gamt').value,10);if(!/^\d{5,15}$/.test(acc))return pop('Неверный номер аккаунта');if(!amt||amt<1)return pop('Укажи сумму');
+      try{$('ggive').disabled=true;await apiCall('/give',{acc,amount:amt});pop('Выдано '+fmt(amt)+' 🪙 → №'+acc);$('gacc').value='';$('gamt').value=''}catch(e){pop(e.message)}$('ggive').disabled=false};
+    $('give').onclick=()=>{const a=parseInt($('amt').value,10);if(!a)return;P.coins+=a;saveP();coins();pop('Выдано '+fmt(a)+' 🪙');$('amt').value=''};
+    $('rst').onclick=()=>{if(confirm('Сбросить?')){P={coins:0,inv:{},cd:{}};saveP();coins()}};
+  }
+  if(sub==='promo'){
+    B.innerHTML=`<div class="card"><b>Новый промокод</b><div class="mut" style="margin:4px 0">Код (буквы и цифры), награда в монетах и лимит активаций (0 = без лимита). Каждый игрок может использовать код один раз.</div><input id="pc" placeholder="Код, например START100" autocapitalize="characters" autocomplete="off"><input id="pa" type="number" inputmode="numeric" min="1" placeholder="Сколько монет"><input id="pm" type="number" inputmode="numeric" min="0" placeholder="Лимит активаций (0 = без лимита)"><button class="btn" id="padd">Создать</button></div>`+(DB.promos.map(p=>`<div class="card"><div class="row"><div class="l"><div style="min-width:0"><b>${esc(p.code)}</b><br><span class="mut">🪙 ${fmt(p.coins)} · использовано ${fmt(p.used||0)}${p.max>0?' из '+fmt(p.max):' (без лимита)'}</span></div></div><button class="btn sm del" data-dp="${p.id}">🗑</button></div></div>`).join('')||'<div class="empty">Промокодов пока нет</div>');
+    $('padd').onclick=()=>{const code=normCode($('pc').value),coins_=parseInt($('pa').value,10),max=Math.max(0,parseInt($('pm').value,10)||0);if(!/^[A-Z0-9_-]{3,20}$/.test(code))return pop('Код: 3–20 символов, латиница и цифры');if(!coins_||coins_<1)return pop('Укажи сумму монет');if(DB.promos.some(p=>p.code===code))return pop('Такой код уже есть');DB.promos.push({id:uid(),code,coins:coins_,max,used:0});saveDB();pop('Создан '+code);renderAdmin()};
+    B.querySelectorAll('[data-dp]').forEach(b=>b.onclick=()=>{if(!confirm('Удалить промокод?'))return;DB.promos=DB.promos.filter(p=>p.id!==b.dataset.dp);saveDB();renderAdmin()});
+  }
+  if(sub==='backup'){
+    B.innerHTML=`<div class="card"><b>Бэкап настроек</b><div class="mut" style="margin:6px 0">Брейнроты и кейсы в одном тексте. Скопируй его, чтобы перенести на другое устройство или сохранить.</div><button class="btn" id="ex">Показать / копировать</button><button class="btn alt" id="im" style="margin-top:8px">Вставить бэкап</button></div>`;
+    $('ex').onclick=()=>{const m=modal(`<div class="card"><textarea id="ta" style="width:100%;height:50vh;background:#080b12;color:#fff;border:1px solid var(--line);border-radius:10px;font-size:12px"></textarea><button class="btn" id="cp" style="margin-top:8px">Копировать</button><button class="btn alt" id="x" style="margin-top:8px">Закрыть</button></div>`);$('ta').value=JSON.stringify(DB);$('cp').onclick=()=>{$('ta').select();try{document.execCommand('copy');pop('Скопировано')}catch(e){}};$('x').onclick=()=>m.remove()};
+    $('im').onclick=()=>{const m=modal(`<div class="card"><textarea id="ta" placeholder="Вставь сюда бэкап" style="width:100%;height:50vh;background:#080b12;color:#fff;border:1px solid var(--line);border-radius:10px;font-size:12px"></textarea><button class="btn" id="ok" style="margin-top:8px">Загрузить</button><button class="btn alt" id="x" style="margin-top:8px">Отмена</button></div>`);$('x').onclick=()=>m.remove();$('ok').onclick=()=>{try{const d=JSON.parse($('ta').value);if(!Array.isArray(d.items)||!Array.isArray(d.cases))throw 0;DB=d;DB.dep=DB.dep||[];DB.admins=DB.admins||[];DB.promos=DB.promos||[];saveDB();m.remove();pop('Загружено');renderAll()}catch(e){pop('Неверный бэкап')}}};
+  }
+}
+function itemForm(it){
+  const e=it||{id:uid(),name:'',value:100,rarity:'common',img:''};let img=e.img;
+  const m=modal(`<div class="card"><h3>${it?'Редактировать':'Новый'} брейнрот</h3><input id="n" placeholder="Название" value="${esc(e.name)}"><input id="v" type="number" placeholder="Стоимость (монет)" value="${e.value}"><select id="r">${Object.keys(RAR).map(k=>`<option value="${k}" ${k===e.rarity?'selected':''}>${RAR[k][0]}</option>`).join('')}</select><input id="f" type="file" accept="image/*"><div class="pic" id="pv" style="height:110px">${pic(img,'👾')}</div><button class="btn" id="sv">Сохранить</button><button class="btn alt" id="x" style="margin-top:8px">Отмена</button></div>`);
+  $('f').onchange=async()=>{if($('f').files[0]){img=await readImg($('f').files[0]);$('pv').innerHTML=pic(img,'')}};
+  $('x').onclick=()=>m.remove();
+  $('sv').onclick=()=>{const n=$('n').value.trim(),v=Math.max(0,parseInt($('v').value,10)||0);if(!n)return pop('Введи название');
+    Object.assign(e,{name:n,value:v,rarity:$('r').value,img});if(!it)DB.items.push(e);saveDB();m.remove();renderAdmin()};
+}
+function depForm(o){
+  const e=o||{id:uid(),name:'',value:MIN_DEPOSIT,img:''};let img=e.img;
+  const m=modal(`<div class="card"><h3>${o?'Редактировать':'Новый'} брейнрот для пополнения</h3><input id="n" placeholder="Название" value="${esc(e.name)}"><input id="v" type="number" placeholder="Стоимость одной штуки (монет)" value="${e.value}"><div class="mut">Минимум ${MIN_DEPOSIT} монет. Игрок выбирает от 1 до 10 штук.</div><input id="f" type="file" accept="image/*"><div class="pic" id="pv" style="height:110px">${pic(img,'👾')}</div><button class="btn" id="sv">Сохранить</button><button class="btn alt" id="x" style="margin-top:8px">Отмена</button></div>`);
+  $('f').onchange=async()=>{if($('f').files[0]){img=await readImg($('f').files[0]);$('pv').innerHTML=pic(img,'')}};
+  $('x').onclick=()=>m.remove();
+  $('sv').onclick=()=>{const n=$('n').value.trim(),v=parseInt($('v').value,10)||0;if(!n)return pop('Введи название');if(v<MIN_DEPOSIT)return pop('Минимум '+MIN_DEPOSIT+' монет');
+    Object.assign(e,{name:n,value:v,img});if(!o)DB.dep.push(e);saveDB();m.remove();renderAdmin()};
+}
+function caseForm(cs){
+  const e=cs||{id:uid(),name:'',price:10,img:'',drops:[]};let img=e.img;
+  const w=id=>(e.drops.find(d=>d.itemId===id)||{}).weight;
+  const m=modal(`<div class="card"><h3>${cs?'Редактировать':'Новый'} кейс</h3><input id="n" placeholder="Название кейса" value="${esc(e.name)}"><input id="p" type="number" placeholder="Цена (0 = бесплатно)" value="${e.price}"><input id="cd" type="number" min="0" step="any" placeholder="Лимит: 1 раз в N часов (0 = без лимита)" value="${e.cooldown||0}"><input id="tag" placeholder="Нужен ник: текст в имени/нике Telegram (пусто = не нужен)" value="${esc(e.requireTag||'')}"><input id="rp" type="number" min="0" step="1" placeholder="Репостов для открытия (0 = не нужны)" value="${e.reposts||0}"><input id="f" type="file" accept="image/*"><div class="pic" id="pv" style="height:110px">${pic(img,'📦')}</div>
+  <b>Что падает (галочка + вес шанса)</b><div class="mut" style="margin-bottom:4px">Шанс = вес / сумма всех весов. Процент показан справа.</div>
+  ${DB.items.map(i=>`<div class="ch"><label class="l"><input type="checkbox" data-i="${i.id}" ${w(i.id)?'checked':''}><div class="th">${pic(i.img,'👾')}</div><span style="min-width:0">${esc(i.name)}<br><span class="mut">🪙 ${fmt(i.value)}</span></span></label><div style="display:flex;align-items:center;gap:6px"><input class="wt" type="number" min="0" step="any" data-w="${i.id}" value="${w(i.id)||10}"><b data-pc="${i.id}" style="width:48px;text-align:right"></b></div></div>`).join('')}
+  <button class="btn" id="sv" style="margin-top:10px">Сохранить</button><button class="btn alt" id="x" style="margin-top:8px">Отмена</button></div>`);
+  const upd=()=>{let sum=0;const sel=[];m.querySelectorAll('[data-i]').forEach(c=>{const id=c.dataset.i,wv=parseFloat(m.querySelector(`[data-w="${id}"]`).value)||0;if(c.checked&&wv>0){sum+=wv;sel.push([id,wv])}});
+    m.querySelectorAll('[data-pc]').forEach(b=>{const f=sel.find(s=>s[0]===b.dataset.pc);b.textContent=f?(f[1]/sum*100).toFixed(1)+'%':'—'})};
+  m.addEventListener('input',upd);m.addEventListener('change',upd);upd();
+  $('f').onchange=async()=>{if($('f').files[0]){img=await readImg($('f').files[0]);$('pv').innerHTML=pic(img,'')}};
+  $('x').onclick=()=>m.remove();
+  $('sv').onclick=()=>{const n=$('n').value.trim(),pr=Math.max(0,parseInt($('p').value,10)||0);if(!n)return pop('Введи название');
+    const drops=[];m.querySelectorAll('[data-i]').forEach(c=>{const id=c.dataset.i,wv=parseFloat(m.querySelector(`[data-w="${id}"]`).value)||0;if(c.checked&&wv>0)drops.push({itemId:id,weight:wv})});
+    if(!drops.length)return pop('Выбери хотя бы одного брейнрота');
+    Object.assign(e,{name:n,price:pr,img,drops,cooldown:Math.max(0,parseFloat($('cd').value)||0),requireTag:$('tag').value.trim(),reposts:Math.max(0,parseInt($('rp').value,10)||0)});if(!cs)DB.cases.push(e);saveDB();m.remove();renderAdmin()};
+}
+
+// ===== навигация =====
+function show(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));$('t-'+t).classList.add('on');
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  if(t==='cases')renderCases();if(t==='inv')renderInv();if(t==='up')renderUp();if(t==='admin')renderAdmin();
+}
+function renderAll(){coins();renderCases();renderInv();renderUp();renderAdmin()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.t));
+document.querySelectorAll('#asub button').forEach(b=>b.onclick=()=>{sub=b.dataset.s;renderAdmin()});
+let taps=0,tt;$('logo').onclick=()=>{taps++;clearTimeout(tt);tt=setTimeout(()=>taps=0,1500);if(taps>=5){taps=0;show('admin')}};
+$('pinbtn').onclick=()=>{if($('pin').value===ADMIN_PIN){pinOK=true;$('a-login').style.display='none';$('a-panel').style.display='block';$('pin').value='';renderAdmin()}else pop('Неверный PIN')};
+setInterval(()=>{if($('t-cases').classList.contains('on')&&!busy&&!document.querySelector('.modal'))renderCases()},30000);
+try{Telegram.WebApp.ready();Telegram.WebApp.expand()}catch(e){}
+renderAll();
+</script>
+</body>
+</html>
